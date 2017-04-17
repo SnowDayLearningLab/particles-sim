@@ -71320,8 +71320,9 @@ Line -7500403 true 150 150 210 180
       var setupDone = false;
       var lastButtonClick = 0;
       var lastFocusOut = 0;
-      var playerID = "0000"; // TODO: implement and take this line out
-      var logoRef = dataRef.child("netlogo_events").child(playerID);
+      var playerID = localStorage.getItem("id");
+      var condition = localStorage.getItem("condition");
+      var logoRef = dataRef.child("netlogo_events").child(condition).child(playerID);
       var otherVariableNames = ["play-speed","setup","go/stop"];
       var inputSliderNames = ["number-of-particles","particle-speed","particle-mass","particle-box-size"];
       var currentValues = {
@@ -71330,7 +71331,7 @@ Line -7500403 true 150 150 210 180
         "number-of-particles":506,
         "particle-speed":12,
         "particle-mass":7,
-        "particle-box-size":-26,
+        "particle-box-size":0,
       };
 
 
@@ -71409,26 +71410,27 @@ Line -7500403 true 150 150 210 180
             // if we found something, return (won't have two changes in one event)
             if(modelWasChanged) return;
 
+
             // afterward, check everything else (buttons, play-speed slider)
             // variable names can come from parent innerText
             var eventValue = window.event.target.value;
-            //var text = window.event.target.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'');
-            //var parentText = window.event.target.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'');
-            //var currentVariable = '';
-            var currentVariable = window.event.target.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,''); // strip returns, spaces
+            var text = window.event.target.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'');
+            var parentText = window.event.target.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'');
+            var currentVariable = '';
+            //var currentVariable = window.event.target.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,''); // strip returns, spaces
 
 
             // variable names can come from two different places, so look for the right one
-            // for(var i = 0; i < otherVariableNames.length; i++) {
-            //   if(text == otherVariableNames[i]) {
-            //     currentVariable = text;
-            //     break;
-            //   }
-            //   if(parentText == otherVariableNames[i]) {
-            //     currentVariable = parentText;
-            //     break;
-            //   }
-            // }
+            for(var i = 0; i < otherVariableNames.length; i++) {
+              if(text == otherVariableNames[i]) {
+                currentVariable = text;
+                break;
+              }
+              if(parentText == otherVariableNames[i]) {
+                currentVariable = parentText;
+                break;
+              }
+            }
 
             // if currentVariable hasn't been defined now, we haven't captured anything we're interested in
             if(!currentVariable) return;
@@ -71474,6 +71476,7 @@ Line -7500403 true 150 150 210 180
               }
             }
             // else, handling a variable with known value - don't have to do anything
+
 
             logData(currentVariable, eventValue);
             
