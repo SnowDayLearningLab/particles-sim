@@ -71321,6 +71321,7 @@ Line -7500403 true 150 150 210 180
       var lastButtonClick = 0;
       var lastFocusOut = 0;
       var playerID = localStorage.getItem("id");
+      var playerAge = localStorage.getItem("age");
       var condition = localStorage.getItem("condition");
       var logoRef = dataRef.child("netlogo_events").child(condition).child(playerID);
       var otherVariableNames = ["play-speed","setup","go/stop"];
@@ -71360,6 +71361,11 @@ Line -7500403 true 150 150 210 180
           timestamp:firebase.database.ServerValue.TIMESTAMP,
           tick:tickNum,
         };
+
+        // add in the player age for the setup button (no real relevance, just chosen for convenience)
+        if(variableName == "setup") {
+          data.age = playerAge;
+        }
 
         // push to database
         logoRef.push(data, function(err) {
