@@ -70301,6 +70301,7 @@ _nS('controllers.Local'); _root.controllers.Local.standalone =
   avg-speed                                  ;; average speed of all particles
   fast medium slow                           ;; current counts
   ;;init-size-of-box                         ;; size of box set at setup
+  wall-x
 ]
 
 breed [ particles particle ]
@@ -70330,8 +70331,8 @@ to setup
 end
 
 to update-variables
-  set left-particles particles with [xcor <= particle-box-size]
-  set right-particles particles with [xcor > particle-box-size]
+  set left-particles particles with [xcor <= wall-x]
+  set right-particles particles with [xcor > wall-x]
   if (not any? left-particles) or (not any? right-particles) [ stop ]
   set avg-speed-left     sum [speed] of left-particles   / count left-particles
   set avg-speed-right    sum [speed] of right-particles  / count right-particles
@@ -70397,7 +70398,7 @@ to bounce
   if ( [pcolor] of new-patch != grey )
     [stop]
   ;; if hitting left or right wall, reflect heading around x axis
-  if (abs new-px = box-edge or new-px = particle-box-size)
+  if (abs new-px = box-edge or new-px = wall-x)
     [ set heading (- heading)]
   ;; if hitting top or bottom wall, reflect heading around y axis
   if (abs new-py = box-edge)
@@ -70588,6 +70589,7 @@ to make-box
   ;; space in patches
   ask patches with [((pycor > -1) and (pycor < 5) and (pxcor = particle-box-size))] ;; gap in center line at where the wall is.
     [ set pcolor black ]
+  set wall-x particle-box-size
 end
 
 ;; creates initial particles
@@ -70651,10 +70653,10 @@ ticks
 30.0
 
 BUTTON
-7
-43
-93
-76
+10
+225
+95
+255
 go/stop
 go
 T
@@ -70668,10 +70670,10 @@ NIL
 0
 
 BUTTON
-7
 10
-93
-43
+190
+95
+220
 NIL
 setup
 NIL
@@ -70685,45 +70687,45 @@ NIL
 1
 
 SLIDER
-95
 10
-302
-43
+55
+205
+95
 number-of-particles
 number-of-particles
-1
+400
 1000
-506
+500
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-84
-180
-117
+10
+100
+205
+140
 particle-speed
 particle-speed
 1
 20
-12
+10
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-120
-180
-153
+10
+145
+205
+185
 particle-mass
 particle-mass
 1
 20
-7
+10
 1
 1
 NIL
@@ -70787,14 +70789,14 @@ PENS
 "right" 1.0 0 -8630108 true "" "plotxy ticks (count right-particles)"
 
 SLIDER
-8
-161
-202
-194
+10
+10
+205
+50
 particle-box-size
 particle-box-size
--38
-38
+-20
+20
 0
 1
 1
@@ -70802,10 +70804,10 @@ NIL
 HORIZONTAL
 
 OUTPUT
-7
-208
-247
-262
+10
+270
+210
+300
 13
 
 @#$#@#$#@
