@@ -62697,7 +62697,7 @@ _nS('controllers.Local'); _root['controllers']['Local']['standalone'] =
 
 
     <!-- This can be used to insert nlogo code into this page -->
-    <script type="text/nlogo" id="nlogo-code" data-filename="sim.nlogo">globals
+    <script type="text/nlogo" id="nlogo-code" data-filename="particles-sim_new.nlogo">globals
 [
   tick-delta                                 ;; how much we advance the tick counter this time through
   max-tick-delta                             ;; the largest tick-delta is allowed to be
@@ -62763,7 +62763,12 @@ to update-variables
 end
 
 to go
-  if left-count >= 5 or right-count >= 5 [
+  if left-count >= 5 [
+    output-print "Left finished first!"
+    stop
+  ]
+  if right-count >= 5 [
+    output-print "Right finished first!"
     stop
   ]
   check-finishLine
@@ -63304,6 +63309,13 @@ particle-mass-right
 1
 NIL
 HORIZONTAL
+
+OUTPUT
+20
+310
+200
+340
+12
 
 @#$#@#$#@
 ## WHAT IS IT?
