@@ -10,6 +10,21 @@
   color: black;
 }
 
+table {
+    border-collapse: collapse;    
+}
+td, th {
+    border: 1px solid #ccc;
+    padding: 10px;
+    font-family:'Lucida Grande'; sans-serif; font-size:12px;
+}
+input[type="radio"] {
+  text-align: center;
+}
+th:empty {
+    border: 0;
+}
+
 /* PADDING */
 
 .CodeMirror-lines {
@@ -1641,39 +1656,46 @@ img.link-img {
 </div>
 
     <div id="netlogo-model-container" style="display: inline-block; max-width:68%; float:left;"></div>
-    <div id="questions" style="display: inline-block; width:30%; float:right; font-family:'Lucida Grande', sans-serif; font-size:14px;">
-      <p>Which of the following impacted whether or not the particles made it to the other side quicker?</p>
-      <p>You can change your answer as often as you need - just mark what you think about each as you go along!</p>
-      <div>
-        <p>Number of particles in the box</p>
-        <input type="radio" class="impactQuestion" name="num-particles" value="matters">It matters<br />
-        <input type="radio" class="impactQuestion" name="num-particles" value="doesnt-matter"> It doesn't matter<br />
-        <input type="radio" class="impactQuestion" name="num-particles" value="dont-know" checked> I don't know
-      </div>
-      <div>
-        <p>Size of the box</p>
-        <input type="radio" class="impactQuestion" name="box-size" value="matters">It matters<br />
-        <input type="radio" class="impactQuestion" name="box-size" value="doesnt-matter"> It doesn't matter<br />
-        <input type="radio" class="impactQuestion" name="box-size" value="dont-know" checked> I don't know
-      </div>
-      <div>
-        <p>Speed of the particles</p>
-        <input type="radio" class="impactQuestion" name="particle-speed" value="matters">It matters<br />
-        <input type="radio" class="impactQuestion" name="particle-speed" value="doesnt-matter"> It doesn't matter<br />
-        <input type="radio" class="impactQuestion" name="particle-speed" value="dont-know" checked> I don't know
-      </div>
-      <div>
-        <p>Color of the particles</p>
-        <input type="radio" class="impactQuestion" name="particle-color" value="matters">It matters<br />
-        <input type="radio" class="impactQuestion" name="particle-color" value="doesnt-matter"> It doesn't matter<br />
-        <input type="radio" class="impactQuestion" name="particle-color" value="dont-know" checked> I don't know
-      </div>
-      <div>
-        <p>Mass of the particles</p>
-        <input type="radio" class="impactQuestion" name="particle-mass" value="matters">It matters<br />
-        <input type="radio" class="impactQuestion" name="particle-mass" value="doesnt-matter"> It doesn't matter<br />
-        <input type="radio" class="impactQuestion" name="particle-mass" value="dont-know" checked> I don't know
-      </div>
+    <div id="questions" style="display: inline-block; width:370px; position:absolute; left:590px; top:270px; font-family:'Lucida Grande', sans-serif; font-size:12px;">
+      <p>Which of the following impacted whether or not the particles made it to the other side quicker? You can change your answer as often as you need - just mark what you think about each as you go along!</p>
+      <table>
+          <tr>
+              <th></th>
+              <th>It matters</th>
+              <th>It doesn't matter</th>
+              <th>I don't know</th>
+          </tr>
+          <tr>
+              <td>Number of particles in the box</td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="num-particles" value="matters"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="num-particles" value="doesnt-matter"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="num-particles" value="dont-know" checked></td>
+          </tr>
+          <tr>
+              <td>Size of the box</td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="box-size" value="matters"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="box-size" value="doesnt-matter"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="box-size" value="dont-know" checked></td>
+          </tr>
+          <tr>
+              <td>Mass of the particles</td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-mass" value="matters"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-mass" value="doesnt-matter"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-mass" value="dont-know" checked></td>
+          </tr>
+          <tr>
+              <td>Speed of the particles</td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-speed" value="matters"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-speed" value="doesnt-matter"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-speed" value="dont-know" checked></td>
+          </tr>
+          <tr>
+              <td>Color of the particles</td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-color" value="matters"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-color" value="doesnt-matter"></td>
+              <td style="text-align:center;"><input type="radio" class="impactQuestion" name="particle-color" value="dont-know" checked></td>
+          </tr>
+      </table>
     </div>
     <script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
     <script>
