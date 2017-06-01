@@ -1640,7 +1640,54 @@ img.link-img {
     </div>
 </div>
 
-    <div id="netlogo-model-container" style="display: inline-block;"></div>
+    <div id="netlogo-model-container" style="display: inline-block; max-width:68%; float:left;"></div>
+    <div id="questions" style="display: inline-block; width:30%; float:right; font-family:'Lucida Grande', sans-serif; font-size:14px;">
+      <p>Which of the following impacted whether or not the particles made it to the other side quicker?</p>
+      <p>You can change your answer as often as you need - just mark what you think about each as you go along!</p>
+      <div>
+        <p>Number of particles in the box</p>
+        <input type="radio" class="impactQuestion" name="num-particles" value="matters">It matters<br />
+        <input type="radio" class="impactQuestion" name="num-particles" value="doesnt-matter"> It doesn't matter<br />
+        <input type="radio" class="impactQuestion" name="num-particles" value="dont-know" checked> I don't know
+      </div>
+      <div>
+        <p>Size of the box</p>
+        <input type="radio" class="impactQuestion" name="box-size" value="matters">It matters<br />
+        <input type="radio" class="impactQuestion" name="box-size" value="doesnt-matter"> It doesn't matter<br />
+        <input type="radio" class="impactQuestion" name="box-size" value="dont-know" checked> I don't know
+      </div>
+      <div>
+        <p>Speed of the particles</p>
+        <input type="radio" class="impactQuestion" name="particle-speed" value="matters">It matters<br />
+        <input type="radio" class="impactQuestion" name="particle-speed" value="doesnt-matter"> It doesn't matter<br />
+        <input type="radio" class="impactQuestion" name="particle-speed" value="dont-know" checked> I don't know
+      </div>
+      <div>
+        <p>Color of the particles</p>
+        <input type="radio" class="impactQuestion" name="particle-color" value="matters">It matters<br />
+        <input type="radio" class="impactQuestion" name="particle-color" value="doesnt-matter"> It doesn't matter<br />
+        <input type="radio" class="impactQuestion" name="particle-color" value="dont-know" checked> I don't know
+      </div>
+      <div>
+        <p>Mass of the particles</p>
+        <input type="radio" class="impactQuestion" name="particle-mass" value="matters">It matters<br />
+        <input type="radio" class="impactQuestion" name="particle-mass" value="doesnt-matter"> It doesn't matter<br />
+        <input type="radio" class="impactQuestion" name="particle-mass" value="dont-know" checked> I don't know
+      </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/3.7.0/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyBt2yP7r-iMqTn6XZzXyEWCFkEcw9vkv28",
+        authDomain: "particles-sim.firebaseapp.com",
+        databaseURL: "https://particles-sim.firebaseio.com",
+        projectId: "particles-sim",
+        storageBucket: "particles-sim.appspot.com",
+        messagingSenderId: "260573413193"
+      };
+      firebase.initializeApp(config);
+    </script>
     <script>/*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -63838,6 +63885,200 @@ Line -7500403 true 150 150 210 180
           }
         }, 200);
       }
+
+      var sliders = document.getElementsByClassName("netlogo-slider-value");
+      for (i=0; i<sliders.length; i++){
+          sliders[i].childNodes[0].readOnly=true;
+      }
+
+      $(".impactQuestion").click(function() {
+        var varName = this.name + "-impact";
+        logData(varName, this.value);
+
+      });
+
+      var dataRef = firebase.database().ref();
+      var setupDone = false;
+      var lastButtonClick = 0;
+      var lastFocusOut = 0;
+      var playerID = localStorage.getItem("id");
+      var playerAge = localStorage.getItem("age");
+      var condition = localStorage.getItem("condition");
+      var logoRef = dataRef.child("netlogo_events").child(condition).child(playerID);
+      var otherVariableNames = ["play-speed","setup","go/stop","Open"];
+      var inputSliderNames = ["number-of-particles-left","box-size-left","particle-mass-left","particle-speed-left","number-of-particles-right","box-size-right","particle-mass-right","particle-speed-right"];
+      var currentValues = {
+        "number-of-particles-left":300,
+        "box-size-left":20,
+        "particle-mass-left":10,
+        "particle-speed-left":10,
+        "number-of-particles-right":300,
+        "box-size-right":20,
+        "particle-mass-right":10,
+        "particle-speed-right":10,
+        "go/stop":true,
+      };
+      var numFinishes = 0;
+
+
+      // set timer to continually check (every second) if the model has reached equilbrium
+      var timer;
+      timer = setInterval(function() {
+          if($(".netlogo-output-area").length > 0) {
+            //  when the model reaches equilibrium, "Equal" is output to a specific box
+            // so check if the text is there
+            var finishedList = $(".netlogo-output-area")[0].innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'').split("finishedfirst!"); // strip returns, spaces
+            // text is now an array of directions ended by the empty string, e.g., ["Right","Left","Right",""];
+            var numLines = finishedList.length - 1; // ignore the ""
+            if(numLines > numFinishes) {
+              var firstSide = finishedList[numLines-1];
+              numFinishes = numLines;
+              // log equilibrium event
+              // previously stopped the timer, but to allow continuous checking just leave it running
+              //clearInterval(timer);
+              logData("model-equilibrium-reached", firstSide);
+            }
+          }
+      }, 1000);
+
+      var logData = function(variableName, currentValue) {
+        var tickNum = $(".netlogo-tick-counter span")[0].innerHTML ? parseInt($(".netlogo-tick-counter span")[0].innerHTML) : 0;
+
+        // data to log online
+        var data = {
+          variable:variableName,
+          value:currentValue,
+          timestamp:firebase.database.ServerValue.TIMESTAMP,
+          tick:tickNum,
+        };
+
+        // add in the player age for the setup button (no real relevance, just chosen for convenience)
+        if(variableName == "setup") {
+          data.age = playerAge;
+        }
+
+        // push to database
+        logoRef.push(data, function(err) {
+          if(err) {
+            console.log(err);
+          }
+        }).then(function(result) {
+          //var key = result.key;
+          //console.log(key);
+          // console.log(data);
+          // console.log("logged successfully");
+        });
+
+      };
+
+
+      /* from: https://groups.google.com/forum/#!topic/netlogo-devel/np_136n8nSU */
+      [].forEach.call( // Can't call `forEach` directly on the fake array that comes out of `document.getElementsByClassName`
+        document.getElementsByClassName("netlogo-widget"), // All widgets have this CSS class
+        function(widget) {
+          $(".netlogo-slider-value input").on("focusout", function() {
+            checkInputValues();
+          });
+          /* Checks the four model slider values and logs any changes
+           * Returns true if it found a difference, returns false otherwise
+           */
+          var checkInputValues = function() {
+            var currentTime = (new Date()).getTime();
+            if(currentTime - lastFocusOut < 50) return; // ignore multiple focus-out events fired within the last 0.05 seconds
+            lastFocusOut = currentTime;
+            var inputs = $(".netlogo-slider-value input");
+            // iterate over the model slider values and look for any changes
+            for(var i = 0; i < inputs.length; i++) {
+              var input = inputs[i];
+              var variableName = input.parentElement.parentElement.innerHTML.substring(28).split("</")[0]; // grabs the variable name from an HTML string
+              if(parseInt(input.value) != parseInt(currentValues[variableName])) {
+                logData(variableName, input.value);
+                currentValues[variableName] = input.value;
+                return true;
+              }
+            }
+            return false;
+          }
+          var logIt = function() {
+            //console.log(window.event.clientX, window.event.clientY); 
+            // first, check the four model sliders for changes (probably the most common case)
+            var modelWasChanged = checkInputValues();
+            // if we found something, return (won't have two changes in one event)
+            if(modelWasChanged) return;
+
+            // afterward, check everything else (buttons, play-speed slider)
+            // variable names can come from parent innerText
+            var eventValue = window.event.target.value;
+            var text = window.event.target.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'');
+            var parentText = window.event.target.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'');
+            var currentVariable = '';
+            //var currentVariable = window.event.target.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,''); // strip returns, spaces
+
+
+            // variable names can come from two different places, so look for the right one
+            for(var i = 0; i < otherVariableNames.length; i++) {
+              if(text == otherVariableNames[i]) {
+                currentVariable = text;
+                break;
+              }
+              if(parentText == otherVariableNames[i]) {
+                currentVariable = parentText;
+                break;
+              }
+            }
+
+            // if currentVariable hasn't been defined now, we haven't captured anything we're interested in
+            if(!currentVariable) return;
+            //console.log(window.event);
+            //console.log(window.event.target.parentElement.parentElement.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,''));
+            //if(window.event.target["step"]) console.log("step slider");
+            console.log("item =" + window.event.target + ", parent = " + window.event.target.parentElement.innerText.replace(/(\r\n|\n|\r)/gm, "") + ", id = "
+                + window.event.target.innerText.replace(/(\r\n|\n|\r)/gm, "") + ", value = " + window.event.target.value);
+
+            // if the event isn't on an item we're interested in, stop here
+            // if(!currentVariable || (window.event.target.className.indexOf("label") > -1)) {
+            //   console.log("returning");
+            //   return;
+            // } 
+
+            // the buttons don't have inherent values
+            // for setup, note that there are no relevant values
+            // for go/stop, track start/stop as event value
+            if(currentVariable == "setup") {
+              setupDone = true;
+              // button clicks register up to twice, so keep track of button click times to see when there are double-fires
+              var currentTime = (new Date()).getTime();
+              if(currentTime - lastButtonClick < 20) return;
+              lastButtonClick = currentTime;
+
+              eventValue = "n/a";
+            } else if(currentVariable == "go/stop") {
+              // don't log start/stop before the model is setup!
+              if(!setupDone) return;
+              // button clicks register up to twice, so keep track of button click times to see when there are double-fires
+              var currentTime = (new Date()).getTime();
+              if(currentTime - lastButtonClick < 20) return;
+              lastButtonClick = currentTime;
+
+              eventValue = currentValues["go/stop"] ? "start" : "stop";
+              //console.log(eventValue);
+              currentValues["go/stop"] = !currentValues["go/stop"];
+            } else { // play-speed slider
+              if(!eventValue || (parseFloat(eventValue) == parseFloat(currentValues[currentVariable]))) { // no value or same value
+                return;
+              } else {
+                currentValues[currentVariable] = eventValue;
+              }
+            }
+            // else, handling a variable with known value - don't have to do anything
+
+
+            logData(currentVariable, eventValue);
+            
+          };
+          widget.onclick = logIt;
+
+        });
     </script>
   
 
